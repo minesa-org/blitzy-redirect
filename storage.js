@@ -1,18 +1,14 @@
-import { db } from "./database.js";
-
-// Persist tokens in MongoDB instead of memory
+const store = new Map();
 
 export async function storeDiscordTokens(userId, tokens) {
-    await db
-        .collection("tokens")
-        .updateOne({ userId }, { $set: { tokens } }, { upsert: true });
+    await store.set(`discord-${userId}`, tokens);
 }
 
 export async function getDiscordTokens(userId) {
-    const entry = await db.collection("tokens").findOne({ userId });
-    return entry ? entry.tokens : null;
+    return store.get(`discord-${userId}`);
 }
 
 export async function deleteDiscordTokens(userId) {
-    await db.collection("tokens").deleteOne({ userId });
+    const key = `discord-${userId}`;
+    await store.delete(key);
 }
